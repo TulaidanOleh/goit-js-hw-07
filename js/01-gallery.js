@@ -47,13 +47,9 @@ function openModal(event) {
     console.log("removeEscapeListener");
   }
 
-  function onModalWindowClose() {
-    modalWindow.close();
-  }
-
   function onEscKeyPress(event) {
     if (event.code === "Escape") {
-      onModalWindowClose();
+      modalWindow.close();
     }
   }
 
