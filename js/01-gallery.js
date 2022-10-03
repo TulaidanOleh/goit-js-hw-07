@@ -4,23 +4,58 @@ import { galleryItems } from "./gallery-items.js";
 
 const gallery = document.querySelector(".gallery");
 
-const galleryImg = galleryItems
-  .map((item) => `<li><img src=${item.preview} alt="${item.description}"></li>`)
-  .join("");
+const galleryCreating = (galleryItems) => {
+  return galleryItems
+    .map(
+      ({ original, preview, description }) =>
+        `<div class="gallery__item"> 
+        <a class="gallery__link" href="${original}">
+            <img class="gallery__image" src="${preview}"
+            data-source="${original}" alt="${description}"/>
+        </a>
+    </div>`
+    )
+    .join("");
+};
 
-gallery.insertAdjacentHTML("beforeend", `<ul>${galleryImg}</ul>`);
+gallery.insertAdjacentHTML("beforeend", galleryCreating(galleryItems));
 
 gallery.addEventListener("click", openModal);
 
 function openModal(event) {
-  if (event.target.nodeName !== "IMG") {
+  event.preventDefault();
+
+  if (event.target.nodeName !== `IMG`) {
     return;
   }
 
-  const instance = basicLightbox.create(`
-    <img src="${galleryItems[0].original}" width="1280" height="600">
-`);
+  let modalWindow = basicLightbox.create(
+    `<img src="${event.target.dataset.source}" width="800" height="600">`,
+    {
+      onShow: () => addEcapeListener(),
+      onClose: () => removeEscapeListener(),
+    }
+  );
 
-  instance.show();
-  console.log(event);
+  function addEcapeListener() {
+    window.addEventListener("keydown", onEscKeyPress);
+    console.log("addEcapeListener");
+  }
+
+  function removeEscapeListener() {
+    window.removeEventListener("keydown", onEscKeyPress);
+    console.log("removeEscapeListener");
+  }
+
+  function onModalWindowClose() {
+    modalWindow.close();
+  }
+
+  function onEscKeyPress(event) {
+    if (event.code === "Escape") {
+      onModalWindowClose();
+    }
+  }
+
+  modalWindow.show();
 }
